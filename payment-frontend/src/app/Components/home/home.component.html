@@ -1,0 +1,173 @@
+<nav class="navbar navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">Payment Bank</a>
+</nav>
+<br>
+<div class="container" *ngIf="showComponent;else holiday">
+  <form [formGroup]="sender">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label"> Enter Account Number</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control " (focusout)="fetchDetails(content)" formControlName="accountNumber">
+        <div *ngIf="sender.get('accountNumber')?.touched">
+          <div *ngIf="sender.get('accountNumber')?.errors?.['required']">A/C Number is Required</div>
+          <div *ngIf="sender.get('accountNumber')?.errors?.['minlength']">A/C Number must be 14 digits
+            long
+          </div>
+          <div *ngIf="sender.get('accountNumber')?.errors?.['maxlength']">A/C Number must be 14 digits
+            long
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Sender Name</label>
+      <div class="col-sm-10">
+        <input class="form-control " formControlName="customerName" type="text" placeholder="Sender Name">
+      </div>
+    </div>
+
+    <br>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Balance</label>
+      <div class="col-sm-10">
+        <input class="form-control " formControlName="clearBalance" type="text" placeholder="Sender Account Number">
+      </div>
+    </div>
+    <br>
+  </form>
+
+  <form [formGroup]="receiver">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label"> Receiver Account Number</label>
+      <div class="col-sm-10">
+        <input appNumbersOnly class="form-control" formControlName="receiverAccountNumber" type="text"
+          placeholder="Sender Account Number">
+        <div *ngIf="receiver.get('receiverAccountNumber')?.touched">
+          <div *ngIf="receiver.get('receiverAccountNumber')?.errors?.['required']">A/C Number is Required
+          </div>
+          <div *ngIf="receiver.get('receiverAccountNumber')?.errors?.['minlength']">A/C Number must be 14
+            digits long
+          </div>
+          <div *ngIf="receiver.get('receiverAccountNumber')?.errors?.['maxlength']">A/C Number must be 14
+            digits long
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label"> Receiver Name</label>
+      <div class="col-sm-10">
+        <input formControlName="receiverAccountName" class="form-control" type="text"
+          placeholder="Receiver Account Holder Name">
+      </div>
+    </div>
+    <br>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label"> BIC</label>
+      <div class="col-sm-10">
+        <input (focusout)="fetchBIC(content)" class="form-control" formControlName="receiverBIC" type="text">
+        <div *ngIf='receiver.get("receiverBIC")?.touched'>
+          <div *ngIf="receiver.get('receiverBIC')?.errors?.['required']">BIC is Required</div>
+          <div *ngIf="receiver.get('receiverBIC')?.errors?.['minlength']">BIC must be 11 characters long
+          </div>
+          <div *ngIf="receiver.get('receiverBIC')?.errors?.['maxlength']">BIC must be 11 characters long
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label"> Bank Name</label>
+      <div class="col-sm-10">
+        <input formControlName="receiverBankName" class="form-control" type="text">
+      </div>
+    </div>
+    <br>
+  </form>
+
+  <form [formGroup]="employee">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label"> Select Transfer Type</label>
+      <div class="col-sm-10">
+        <select class="custom-select" formControlName="transferTypeCode">
+          <option selected>select</option>
+          <option *ngFor="let code of transferTypeCodeList |async" [value]="code.value">
+            {{code.name}}
+          </option>
+        </select>
+        <div *ngIf="employee.get('transferTypeCode')?.untouched">Please choose Transfer Type</div>
+      </div>
+    </div>
+
+    <br>
+    <div class="form-group row" [formGroup]="employee">
+      <label class="col-sm-2 col-form-label"> Select Message Code</label>
+      <div class="col-sm-10">
+        <select class="custom-select" formControlName="messageCode">
+          <option selected>select</option>
+          <option *ngFor="let messageType of messageCodes |async" [value]="messageType.messageCode" selected>
+            {{messageType.messageCode}}
+          </option>
+        </select>
+        <div *ngIf="employee.get('messageCode')?.untouched">Please choose Message Code</div>
+      </div>
+    </div>
+    <br>
+    <div class="form-group row" [formGroup]="employee">
+      <label class="col-sm-2 col-form-label"> Select Currency Type</label>
+      <div class="col-sm-10">
+        <select class="custom-select" formsControlName="currencyType" #mySelect (change)='updateINR(mySelect.value)'>
+          <option selected>select</option>
+          <option *ngFor="let currency of currencyTypes " [value]="currency.code">
+            {{currency.code}}
+          </option>
+        </select>
+        <div *ngIf="employee.get('currencyType')?.untouched">Please choose Currency Type</div>
+      </div>
+    </div>
+    <br>
+    <div class="form-group row" [formGroup]="employee">
+      <label class="col-sm-2 col-form-label"> Enter amount</label>
+      <div class="col-sm-10">
+        <input class="form-control" (focusout)="updateINR(mySelect.value)" appNumbersOnly formControlName="amount"
+          placeholder="0" type="text">
+      </div>
+    </div>
+    <div *ngIf="employee.get('amount')?.untouched">Plese enter the amount</div>
+    <br>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Total Amount</label>
+      <div class="col-sm-10">
+        <input class="form-control" formControlName="totalAmount" placeholder="0" type="text">
+      </div>
+    </div>
+    <br>
+    <div class="text-center">
+      <button [disabled]="sender.invalid || receiver.invalid || employee.invalid" class="btn btn-primary btn-lg"
+        (click)="submit(content)">Transfer</button>
+    </div>
+    <br>
+  </form>
+</div>
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{error?.message}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>{{error?.description}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+</ng-template>
+<ng-template #holiday>
+  <div class="justify-content-center mb-3" style="max-width: 18rem;">
+    <div class="card-header">Holiday</div>
+    <div class="card-body">
+      <p class="card-text">Please Come Back on Weekdays</p>
+    </div>
+  </div>
+</ng-template>
